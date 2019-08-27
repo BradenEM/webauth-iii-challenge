@@ -3,6 +3,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const secrets = require("../config/secrets");
+const restricted = require("../auth/restricted-middleware");
 
 const Users = require("../users/users-model");
 
@@ -39,6 +40,16 @@ server.post("/api/login", async (req, res) => {
     } else {
       res.status(401).json({ message: "You shall not pass." });
     }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+server.get("/api/users", restricted, async (req, res) => {
+  const users = await Users.find();
+
+  try {
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json(error);
   }
